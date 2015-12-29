@@ -2,6 +2,8 @@ __author__ = 'daivq'
 
 import scrapy
 
+KWS = ["python", "django", "flask", "openstack", "pyramid", "pylons", "web2py"]
+
 
 def xtract(response, xpath):
     li = []
@@ -31,14 +33,15 @@ class VnwSpider(scrapy.Spider):
     name = "vietnamwork"
     allow_domains = ["vietnamwork.com"]
     start_urls = [
-        "http://www.vietnamworks.com/python-kv"
+        ("http://www.vietnamworks.com/" + kw + "-kv") for kw in KWS
     ]
 
     def parse(self, response):
-        urls = response.xpath(
-            '//a[@class="job-title text-clip text-lg"]/@href').extract()
-        for url in urls:
-            yield scrapy.Request(url, callback=self.parse_content)
+        if response.xpath('//a[@class="job-title text-clip text-lg"]') != []:
+            urls = response.xpath(
+                '//a[@class="job-title text-clip text-lg"]/@href').extract()
+            for url in urls:
+                yield scrapy.Request(url, callback=self.parse_content)
 
 
     def parse_content(self, resp):
