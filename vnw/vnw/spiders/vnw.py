@@ -1,4 +1,4 @@
-__author__ = 'daivq'
+# -*- coding: utf-8 -*-
 
 import scrapy
 from ..items import PyjobItem
