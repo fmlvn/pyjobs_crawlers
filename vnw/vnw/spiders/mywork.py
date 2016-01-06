@@ -3,11 +3,7 @@
 import scrapy
 from ..items import PyjobItem
 from ..pymods import xtract
-
-KWS = ["python", "django",
-       "flask", "openstack",
-       "pyramid", "pylons",
-       "web2py", "scrapy"]
+from ..keywords import KWS
 
 province = u'Nơi làm việc'
 wage = u'Mức lương'
