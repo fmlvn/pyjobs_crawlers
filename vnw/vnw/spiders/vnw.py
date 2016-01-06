@@ -3,9 +3,7 @@
 import scrapy
 from ..items import PyjobItem
 from ..pymods import xtract
-
-KWS = ["python", "django", "flask", "openstack", "pyramid", "pylons", "web2py"]
-
+from ..keywords import KWS
 
 class VnwSpider(scrapy.Spider):
     name = "vietnamwork"
