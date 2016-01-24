@@ -17,14 +17,14 @@ class CareerbuilderSpider(scrapy.Spider):
     name = "careerbuilder"
     allowed_domains = ["careerbuilder.vn"]
     start_urls = [
-        ("http://careerbuilder.vn/vi/tim-viec-lam/tu-khoa/"+ KW +
+        ("http://careerbuilder.vn/vi/tim-viec-lam/tu-khoa/" + KW +
          "/limit/20/sort/score/page/1") for KW in KWS
     ]
-    
+
     def parse(self, resp):
         for href in resp.xpath('//a[@class="job"]/@href').extract():
             yield scrapy.Request(href, self.parse_content)
-        
+
         if resp.xpath('//a[@class="right"]'):
             next_page = resp.xpath('//a[@class="right"]/@href').extract()[0]
             yield scrapy.Request(next_page, callback=self.parse)
@@ -39,20 +39,25 @@ class CareerbuilderSpider(scrapy.Spider):
         item["province"] = xtract(resp,
                                   '//b[@itemprop="jobLocation"]/a/text()')
 
-        if xtract(resp,'//div[@itemprop="description"]/ul/li/text()'):
-            item["work"] = xtract(resp,
-                              '//div[@itemprop="description"]/ul/li/text()')
+        if xtract(resp, '//div[@itemprop="description"]/ul/li/text()'):
+            item["work"] = xtract(
+                    resp,
+                    '//div[@itemprop="description"]/ul/li/text()'
+            )
         else:
             item["work"] = xtract(resp,
                                   '//div[@itemprop="description"]/p/text()')
 
-        if xtract(resp,'//div[@itemprop="experienceRequirements"]/ul/li'):
-            item["specialize"] = xtract(resp,
-                                    '//div[@itemprop="experienceRequirements"]'
-                                    '/p/strong/text()') + u'|' + \
-                                xtract(resp,
-                                    '//div[@itemprop="experienceRequirements"]'
-                                    '/ul/li/text()')
+        if xtract(resp, '//div[@itemprop="experienceRequirements"]/ul/li'):
+            item["specialize"] = xtract(
+                    resp,
+                    '//div[@itemprop="experienceRequirements"]'
+                    '/p/strong/text()'
+            ) + u'|' + xtract(
+                    resp,
+                    '//div[@itemprop="experienceRequirements"]'
+                    '/ul/li/text()'
+            )
         else:
             item["specialize"] = \
                 xtract(resp, '//div[@itemprop="experienceRequirements"]/'
@@ -87,4 +92,3 @@ class CareerbuilderSpider(scrapy.Spider):
         item["logo"] = xtract(resp, '//a[@itemprop="image"]/img/@src')
 
         yield item
-
