@@ -2,7 +2,7 @@
 
 import scrapy
 from ..items import PyjobItem
-from ..pymods import xtract
+from ..pymods import xtract, parse_datetime
 from ..keywords import KWS
 
 province = u'Nơi làm việc'
@@ -14,6 +14,7 @@ specialize = u'Yêu cầu công việc'
 file_request = u'Yêu cầu hồ sơ'
 leadtime = u'Hạn nộp hồ sơ'
 language = u'Ngôn ngữ hồ sơ'
+date_post = u'Ngày cập nhật'
 
 
 class MyworkSpider(scrapy.Spider):
@@ -33,13 +34,16 @@ class MyworkSpider(scrapy.Spider):
 
     def parse_content(self, resp):
         item = PyjobItem()
-	item["url"] = resp.url
+        item["url"] = resp.url
         item["name"] = xtract(resp, '//div[@class="title-job-info"]/text()')
         item["company"] = xtract(resp,
                                  '//h1[@class="fullname-company"]/text()')
         item["address"] = xtract(resp,
                                  '//p[@class="address-company mw-ti"]/text()')
         item["skill"] = ''
+        item["date_post"] = parse_datetime(resp, '//div[@class="action_job sco'
+                                                 're-job-''company"]/ul/li[2]'
+                                                 '/span/text()')
         for desjob in resp.xpath('//div[@class="desjob-company"]'):
             kws = xtract(desjob, 'h4/text()')
             if province == kws:

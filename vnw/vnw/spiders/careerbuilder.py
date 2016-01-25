@@ -3,7 +3,7 @@
 import scrapy
 from ..items import PyjobItem
 from ..keywords import KWS
-from ..pymods import xtract
+from ..pymods import xtract, parse_datetime
 
 
 experience = u'Kinh nghiệm: '
@@ -82,7 +82,8 @@ class CareerbuilderSpider(scrapy.Spider):
             if lb == contact:
                 item["contact"] = xtract(lbs, 'strong/text()')
 
-        item["date_post"] = xtract(resp, '//div[@class="datepost"]/text()')
+        item["date_post"] = parse_datetime(resp, '//div[@class="datepost"]'
+                                                 '/text()')
         item["website"] = xtract(resp, '//span[@class="MarginRight30"]/text()')
         item["logo"] = xtract(resp, '//a[@itemprop="image"]/img/@src')
 
