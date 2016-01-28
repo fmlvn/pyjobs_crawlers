@@ -18,7 +18,7 @@ class PyjobItem(Item):
     information = Field()
     contact = Field()
     size = Field()
-    date_post = Field()
+    post_date = Field()
     website = Field()
     logo = Field()
     leadtime = Field()

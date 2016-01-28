@@ -41,9 +41,10 @@ class MyworkSpider(scrapy.Spider):
         item["address"] = xtract(resp,
                                  '//p[@class="address-company mw-ti"]/text()')
         item["skill"] = ''
-        item["date_post"] = parse_datetime(resp, '//div[@class="action_job sco'
-                                                 're-job-''company"]/ul/li[2]'
+        post_date = xtract(resp, '//div[@class="action_job sco'
+                                                 're-job-company"]/ul/li[2]'
                                                  '/span/text()')
+        item["post_date"] = parse_datetime(post_date)
         for desjob in resp.xpath('//div[@class="desjob-company"]'):
             kws = xtract(desjob, 'h4/text()')
             if province == kws:

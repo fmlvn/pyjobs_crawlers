@@ -87,8 +87,10 @@ class CareerbuilderSpider(scrapy.Spider):
             if lb == contact:
                 item["contact"] = xtract(lbs, 'strong/text()')
 
-        item["date_post"] = parse_datetime(resp, '//div[@class="datepost"]'
-                                                 '/text()')
+        post_date = xtract(resp, '//div[@class="datepost"]/text()')
+        post_date = post_date.split(': ')[1].split('/')
+        post_date = '-'.join(post_date)
+        item["post_date"] = parse_datetime(post_date)
         item["website"] = xtract(resp, '//span[@class="MarginRight30"]/text()')
         item["logo"] = xtract(resp, '//a[@itemprop="image"]/img/@src')
 
