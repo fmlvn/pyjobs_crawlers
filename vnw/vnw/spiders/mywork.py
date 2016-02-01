@@ -3,6 +3,7 @@
 import scrapy
 from ..items import PyjobItem
 from ..pymods import xtract, parse_datetime
+from ..keywords import KWS
 
 province = u'Nơi làm việc'
 wage = u'Mức lương'
@@ -46,9 +47,7 @@ class MyworkSpider(scrapy.Spider):
                                            ' text-align: center;"]/text()')
         if ' ' in expiry_date:
             expiry_date = expiry_date.split(' ')[0]
-            item["expiry_date"] = parse_datetime(expiry_date)
-        else:
-            item["expiry_date"] = parse_datetime(expiry_date)
+        item["expiry_date"] = parse_datetime(expiry_date)
 
         for desjob in resp.xpath('//div[@class="desjob-company"]'):
             kws = xtract(desjob, 'h4/text()')
