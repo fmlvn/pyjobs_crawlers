@@ -21,7 +21,7 @@ class PyjobItem(Item):
     post_date = Field()
     website = Field()
     logo = Field()
-    leadtime = Field()
+    expiry_date = Field()
     url = Field()
     level = Field()
     language = Field()

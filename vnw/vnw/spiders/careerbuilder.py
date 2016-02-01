@@ -9,7 +9,7 @@ from ..pymods import xtract, parse_datetime
 experience = u'Kinh nghiệm: '
 level = u'Cấp bậc: '
 wage = u'Lương: '
-leadtime = u'Hết hạn nộp: '
+expiry_date = u'Hết hạn nộp: '
 contact = u'Người liên hệ: '
 
 
@@ -79,8 +79,14 @@ class CareerbuilderSpider(scrapy.Spider):
                     item["wage"] = xtract(kws, 'label/text()')
                 else:
                     item["wage"] = xtract(kws, 'text()')
-            if kw == leadtime:
-                item["leadtime"] = xtract(kws, 'text()')
+            if kw == expiry_date:
+                expiry = xtract(kws, 'text()')
+                if u'/' not in expiry:
+                    item["expiry_date"] = parse_datetime(expiry)
+                else:
+                    expiry = expiry.split('/')
+                    expiry = '-'.join(expiry)
+                    item["expiry_date"] = parse_datetime(expiry)
 
         for lbs in resp.xpath('//p[@class="TitleDetailNew"]/label'):
             lb = xtract(lbs, 'text()')
