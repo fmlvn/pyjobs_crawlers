@@ -22,8 +22,12 @@ class CareerbuilderSpider(scrapy.Spider):
     ]
 
     def parse(self, resp):
+        url = resp.url
+        keyword = url.split("/tu-khoa/")[1].split("/limit/")[0]
         for href in resp.xpath('//a[@class="job"]/@href').extract():
-            yield scrapy.Request(href, self.parse_content)
+            request = scrapy.Request(href, self.parse_content)
+            request.meta["keyword"] = keyword
+            yield request
 
         if resp.xpath('//a[@class="right"]'):
             next_page = resp.xpath('//a[@class="right"]/@href').extract()[0]
@@ -31,6 +35,7 @@ class CareerbuilderSpider(scrapy.Spider):
 
     def parse_content(self, resp):
         item = PyjobItem()
+        item["keyword"] = resp.meta["keyword"]
         item["url"] = resp.url
         item["name"] = xtract(resp, '//h1[@itemprop="title"]/text()')
         item["company"] = xtract(resp, '//span[@itemprop="name"]/text()')

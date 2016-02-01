@@ -28,4 +28,5 @@ class PyjobItem(Item):
     file_request = Field()
     other_info = Field()
     experience = Field()
+    keyword = Field()
     pass
