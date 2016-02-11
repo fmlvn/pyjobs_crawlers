@@ -13,6 +13,7 @@ welfare = u'Quyền lợi được hưởng'
 specialize = u'Yêu cầu công việc'
 file_request = u'Yêu cầu hồ sơ'
 language = u'Ngôn ngữ hồ sơ'
+date_post = u'Ngày cập nhật'
 
 
 class MyworkSpider(scrapy.Spider):
@@ -47,10 +48,10 @@ class MyworkSpider(scrapy.Spider):
                                  '//h1[@class="fullname-company"]/text()')
         item["address"] = xtract(resp,
                                  '//p[@class="address-company mw-ti"]/text()')
-        date_post = xtract(resp, '//div[@class="action_job sco'
+        post_date = xtract(resp, '//div[@class="action_job sco'
                                                  're-job-company"]/ul/li[2]'
                                                  '/span/text()')
-        item["date_post"] = parse_datetime(date_post)
+        item["post_date"] = parse_datetime(post_date)
         expiry_date = xtract(resp, '//div[@style="padding-top: 44px;'
                                            ' text-align: center;"]/text()')
         if ' ' in expiry_date:
