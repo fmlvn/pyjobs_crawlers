@@ -46,8 +46,8 @@ class CareerbuilderSpider(scrapy.Spider):
 
         if xtract(resp, '//div[@itemprop="description"]/ul/li/text()'):
             item["work"] = xtract(
-                    resp,
-                    '//div[@itemprop="description"]/ul/li/text()'
+                resp,
+                '//div[@itemprop="description"]/ul/li/text()'
             )
         else:
             item["work"] = xtract(resp,
@@ -55,13 +55,13 @@ class CareerbuilderSpider(scrapy.Spider):
 
         if xtract(resp, '//div[@itemprop="experienceRequirements"]/ul/li'):
             item["specialize"] = xtract(
-                    resp,
-                    '//div[@itemprop="experienceRequirements"]'
-                    '/p/strong/text()'
+                resp,
+                '//div[@itemprop="experienceRequirements"]'
+                '/p/strong/text()'
             ) + u'|' + xtract(
-                    resp,
-                    '//div[@itemprop="experienceRequirements"]'
-                    '/ul/li/text()'
+                resp,
+                '//div[@itemprop="experienceRequirements"]'
+                '/ul/li/text()'
             )
         else:
             item["specialize"] = \
@@ -98,10 +98,10 @@ class CareerbuilderSpider(scrapy.Spider):
             if lb == contact:
                 item["contact"] = xtract(lbs, 'strong/text()')
 
-        post_date = xtract(resp, '//div[@class="datepost"]/text()')
-        post_date = post_date.split(': ')[1].split('/')
-        post_date = '-'.join(post_date)
-        item["post_date"] = parse_datetime(post_date)
+        date_post = xtract(resp, '//div[@class="datepost"]/text()')
+        date_post = date_post.split(': ')[1].split('/')
+        date_post = '-'.join(date_post)
+        item["date_post"] = parse_datetime(date_post)
         item["website"] = xtract(resp, '//span[@class="MarginRight30"]/text()')
         item["logo"] = xtract(resp, '//a[@itemprop="image"]/img/@src')
 
