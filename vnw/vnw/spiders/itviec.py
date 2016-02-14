@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 import scrapy
 from ..keywords import KWS
 from ..items import PyjobItem
@@ -34,7 +36,8 @@ class ItviecSpider(scrapy.Spider):
         day = expiry_date.split(' ')[-1]
         month = expiry_date.split(' ')[-2]
         month_convert = convert(month)
-        item["expiry_date"] = month_convert + '-' + day
+        item["expiry_date"] = '-'.join([str(datetime.date.today().year),
+                                       month_convert, day])
         item["province"] = resp.xpath('//div[@class="address"]'
                                       '/text()').extract()[0].split(',')[0]
         item["work"] = xtract(resp, '//div[@class="description"]/p/text()')
