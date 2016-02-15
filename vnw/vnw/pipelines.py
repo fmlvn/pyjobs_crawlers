@@ -50,5 +50,5 @@ class APIPipeline(object):
                 else:
                     logger.error('Wide value: %s',  kw)
             except KeyError as e:
-                logger.error('Not found %s, error: %s', item[kw], e)
+                logger.error('Not found %s, error: %s', kw, e)
 
