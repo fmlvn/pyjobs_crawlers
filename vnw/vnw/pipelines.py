@@ -35,6 +35,7 @@ class VnwPipeline(object):
     def process_item(self, item, spider):
         return item
 
+
 class APIPipeline(object):
 
     collection_name = 'scrapy_items'
@@ -45,10 +46,10 @@ class APIPipeline(object):
     def process_item(self, item, spider):
         for kw in KWS:
             try:
-                if item[kw]:
+                if item[kw].strip():
                     requests.post(self.url, json=item._values)
                 else:
-                    logger.error('Wide value: %s',  kw)
+                    logger.error('Empty value: %s',  kw)
             except KeyError as e:
                 logger.error('Not found %s, error: %s', kw, e)
 
