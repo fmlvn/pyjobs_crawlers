@@ -2,6 +2,7 @@ import logging
 import requests
 
 logger = logging.getLogger(__name__)
+KWS = ['name', 'post_date', 'company', 'province', 'url']
 
 
 class ElasticSearchPipeline(object):
@@ -34,7 +35,6 @@ class VnwPipeline(object):
     def process_item(self, item, spider):
         return item
 
-
 class APIPipeline(object):
 
     collection_name = 'scrapy_items'
@@ -43,4 +43,11 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
-        requests.post(self.url, json=item._values)
+        for kw in KWS:
+            try:
+                if item[kw]:
+                    requests.post(self.url, json=item._values)
+                else:
+                    logger.error('Wide value: %s',  kw)
+            except KeyError as e:
+
