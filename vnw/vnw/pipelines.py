@@ -2,6 +2,7 @@ import logging
 import requests
 
 logger = logging.getLogger(__name__)
+KWS = ['name', 'post_date', 'company', 'province', 'url']
 
 
 class ElasticSearchPipeline(object):
@@ -43,4 +44,12 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
-        requests.post(self.url, json=item._values)
+        for kw in KWS:
+            try:
+                if item[kw].strip():
+                    requests.post(self.url, json=item._values)
+                else:
+                    logger.error('Empty value: %s',  kw)
+            except KeyError as e:
+                logger.error('Not found %s, error: %s', kw, e)
+
