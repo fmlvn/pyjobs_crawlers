@@ -32,7 +32,7 @@ class MyworkSpider(scrapy.Spider):
 
         try:
             if resp.xpath('//div[@class="mywork-pages pagination"]/a/@class').\
-                extract()[-1] != u'disabled':
+                    extract()[-1] != u'disabled':
                 next_page = resp.xpath('//div[@class="mywork-pages pagination"'
                                        ']/a/@href').extract()[-1]
                 yield scrapy.Request(resp.urljoin(next_page), self.parse)
@@ -54,11 +54,14 @@ class MyworkSpider(scrapy.Spider):
         item["post_date"] = parse_datetime(post_date)
         expiry_date = xtract(resp, '//div[@style="padding-top: 44px;'
                                            ' text-align: center;"]/text()')
-        if ' ' in expiry_date:
-            expiry_date = expiry_date.split(' ')[0]
-            item["expiry_date"] = parse_datetime(expiry_date)
-        else:
-            item["expiry_date"] = parse_datetime(expiry_date)
+        try:
+            if ' ' in expiry_date:
+                expiry_date = expiry_date.split(' ')[0]
+                item["expiry_date"] = parse_datetime(expiry_date)
+            else:
+                item["expiry_date"] = parse_datetime(expiry_date)
+        except ValueError:
+            item["expiry_date"] = u'Đã Hết Hạn'
 
         for desjob in resp.xpath('//div[@class="desjob-company"]'):
             kws = xtract(desjob, 'h4/text()')
@@ -77,14 +80,9 @@ class MyworkSpider(scrapy.Spider):
                 else:
                     item["work"] = xtract(desjob, 'div/text()')
             if welfare == kws:
-                if xtract(desjob, 'p/text()') != u' ':
-                    item["welfare"] = xtract(desjob, 'p/text()')
-                elif xtract(desjob, 'p/text()'):
-                    if xtract(desjob, 'p/span/text()') != u' ':
-                        item["welfare"] = xtract(desjob, 'p/span/text()')
-                    else:
-                        item["welfare"] = xtract(
-                            desjob, 'div[@class="job_more_detail"]/text()')
+                if not xtract(desjob, 'p/span/text()'):
+                    item["welfare"] = xtract(desjob, 'p/span/text()')
+                item["welfare"] = xtract(desjob, 'p/text()')
             if specialize == kws:
                 if xtract(desjob, 'p/text()') != u' ':
                     item["specialize"] = xtract(desjob, 'p/text()')
@@ -97,4 +95,4 @@ class MyworkSpider(scrapy.Spider):
                     item["file_request"] = xtract(desjob, 'p/span/text()')
             if language == kws:
                 item["language"] = xtract(desjob, 'p/text()')
-            yield item
+        yield item
