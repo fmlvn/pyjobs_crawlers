@@ -29,4 +29,6 @@ class PyjobItem(Item):
     other_info = Field()
     experience = Field()
     keyword = Field()
+    content = Field()
+    
     pass
