@@ -47,9 +47,9 @@ class APIPipeline(object):
         for kw in KWS:
             try:
                 if item[kw].strip():
-                    requests.post(self.url, json=item._values)
+                    continue
                 else:
                     logger.error('Empty value: %s',  kw)
             except KeyError as e:
                 logger.error('Not found %s, error: %s', kw, e)
-
+        requests.post(self.url, json=item._values)
