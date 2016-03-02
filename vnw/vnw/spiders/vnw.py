@@ -5,14 +5,34 @@ from ..items import PyjobItem
 from ..pymods import xtract
 from ..keywords import KWS
 from ..pymods import parse_datetime
+from scrapy.contrib.spiders.init import InitSpider
+from scrapy.http import Request, FormRequest
 
 
-class VnwSpider(scrapy.Spider):
+class VnwSpider(InitSpider):
     name = "vietnamwork"
     allowed_domains = ["vietnamwork.com"]
+    login_page = "http://www.vietnamworks.com/login"
     start_urls = [
         ("http://www.vietnamworks.com/" + kw + "-kw") for kw in KWS
     ]
+
+    
+    def init_request(self):
+        return Request(url=self.login_page, callback=self.login)
+
+
+    def login(self, resp):
+        return FormRequest.from_response(resp,
+            method='POST',
+            formdata={'form[username]': '', 'form[password]': ''},
+            callback=self.check_login,
+            dont_filter=True
+            )
+
+
+    def check_login(self, resp):
+        return self.initialized()
 
     def parse(self, resp):
         url = resp.url
@@ -40,7 +60,7 @@ class VnwSpider(scrapy.Spider):
         item["address"] = xtract(resp, '//span[@class="company-address block"]'
                                        '/text()')
         item["province"] = xtract(resp, '//span[@itemprop="address"]/a/text()')
-        item["wage"] = xtract(resp, '//div[@class="col-sm-12"]/div/text()')
+        item["wage"] = xtract(resp, '//span[@class="orange bold-700 text-lg"]/text()')
         item["work"] = xtract(resp, '//div[@id="job-description"]/text()')
         item["specialize"] = xtract(resp, '//div[@class=""]/text()')
         item["information"] = xtract(resp,
