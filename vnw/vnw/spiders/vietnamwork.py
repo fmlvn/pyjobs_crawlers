@@ -76,7 +76,7 @@ class VnwSpider(InitSpider):
         except IndexError:
             item["size"] = ''
         item["logo"] = xtract(resp, '//img[@class="logo img-responsive"]/@src')
-	item["expiry_date"] = '02-03-2016'
+	item["expiry_date"] = ''
 
         yield item
         
