@@ -7,6 +7,7 @@ from ..keywords import KWS
 from ..pymods import parse_datetime
 from scrapy.contrib.spiders.init import InitSpider
 from scrapy.http import Request, FormRequest
+from scrapy.conf import settings
 
 
 class VnwSpider(InitSpider):
@@ -23,9 +24,11 @@ class VnwSpider(InitSpider):
 
 
     def login(self, resp):
+        user = settings.get('VIETNAMWORK_USERNAME')
+        password = settings.get('VIETNAMWORK_PASSWORD')
         return FormRequest.from_response(resp,
             method='POST',
-            formdata={'form[username]': '', 'form[password]': ''},
+            formdata={'form[username]': user, 'form[password]': password },
             callback=self.check_login,
             dont_filter=True
             )
@@ -73,5 +76,7 @@ class VnwSpider(InitSpider):
         except IndexError:
             item["size"] = ''
         item["logo"] = xtract(resp, '//img[@class="logo img-responsive"]/@src')
+	item["expiry_date"] = '02-03-2016'
+
         yield item
         
