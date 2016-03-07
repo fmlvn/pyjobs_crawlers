@@ -4,10 +4,9 @@ import scrapy
 from ..items import PyjobItem
 from ..pymods import xtract
 from ..keywords import KWS
-from scrapy.spiders.init import InitSpider
+from ..pymods import parse_datetime
+from scrapy.contrib.spiders.init import InitSpider
 from scrapy.http import Request, FormRequest
-from scrapy.conf import settings
-import dateutil.parser
 
 
 class VnwSpider(InitSpider):
@@ -24,11 +23,9 @@ class VnwSpider(InitSpider):
 
 
     def login(self, resp):
-        user = settings.get('VIETNAMWORK_USERNAME')
-        password = settings.get('VIETNAMWORK_PASSWORD')
         return FormRequest.from_response(resp,
             method='POST',
-            formdata={'form[username]': user, 'form[password]': password },
+            formdata={'form[username]': '', 'form[password]': ''},
             callback=self.check_login,
             dont_filter=True
             )
@@ -43,11 +40,12 @@ class VnwSpider(InitSpider):
         for div in resp.xpath('//div[@class="col-sm-9 col-sm-pull-3"]'):
             post_date = div.xpath('div/div/div/span/span/span/text()').extract()[0]
             post_date = post_date.split(': ')[1]
-            convert_post_date = dateutil.parser.parse(post_date)
+            post_date = '-'.join(post_date.split('/'))
+            convert_post_date = parse_datetime(post_date)
             for url in div.xpath('div/a/@href').extract():
                 request = scrapy.Request(url, self.parse_content, dont_filter=True)
                 request.meta["keyword"] = keyword
-                request.meta["post_date"] = str(convert_post_date).split(' ')[0]
+                request.meta["post_date"] = convert_post_date
                 yield request
 
     def parse_content(self, resp):
@@ -75,7 +73,5 @@ class VnwSpider(InitSpider):
         except IndexError:
             item["size"] = ''
         item["logo"] = xtract(resp, '//img[@class="logo img-responsive"]/@src')
-	item["expiry_date"] = ''
-
         yield item
         
