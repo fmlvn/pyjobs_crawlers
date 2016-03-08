@@ -5,6 +5,14 @@ logger = logging.getLogger(__name__)
 KWS = ['name', 'post_date', 'company', 'province', 'url']
 
 
+def xtract_item(item):
+    for key, value in item.iteritems():
+        for num in range(4):
+            value = value.strip('-').strip().strip('+').strip(':')
+        item[key] = value
+    return item
+
+
 class ElasticSearchPipeline(object):
 
     collection_name = 'scrapy_items'
@@ -44,12 +52,11 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
-        for kw in KWS:
+        if all(item[kw].strip() for kw in KWS):
+            item = xtract_item(item)
             try:
-                if item[kw].strip():
-                    continue
-                else:
-                    logger.error('Empty value: %s',  kw)
+                requests.post(self.url, json=item._values)
             except KeyError as e:
-                logger.error('Not found %s, error: %s', kw, e)
-        requests.post(self.url, json=item._values)
+                logger.error('Error: %s', e)
+        else:
+            logger.error('Bad job: %s', item['name'])
