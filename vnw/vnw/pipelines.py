@@ -8,6 +8,7 @@ KWS = ['name', 'post_date', 'company', 'province', 'url']
 def xtract_item(item):
     for key, value in item.iteritems():
         for num in range(4):
+            # use 4 loops to handle all cases because there are 4 characters
             value = value.strip('-').strip().strip('+').strip(':')
         item[key] = value
     return item
