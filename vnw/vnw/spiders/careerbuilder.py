@@ -17,8 +17,8 @@ class CareerbuilderSpider(scrapy.Spider):
     name = "careerbuilder"
     allowed_domains = ["careerbuilder.vn"]
     start_urls = [
-        ("http://careerbuilder.vn/vi/tim-viec-lam/tu-khoa/" + KW +
-         "/limit/20/sort/score/page/1") for KW in KWS
+        ("http://careerbuilder.vn/viec-lam/" + KW +
+         "-k-trang-1-vi.html") for KW in KWS
     ]
 
     def parse(self, resp):
