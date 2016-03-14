@@ -23,7 +23,7 @@ class CareerbuilderSpider(scrapy.Spider):
 
     def parse(self, resp):
         url = resp.url
-        keyword = url.split("/tu-khoa/")[1].split("/limit/")[0]
+        keyword = url.split("/viec-lam/")[1].split("-k-")[0]
         for href in resp.xpath('//a[@class="job"]/@href').extract():
             request = scrapy.Request(href, self.parse_content)
             request.meta["keyword"] = keyword
