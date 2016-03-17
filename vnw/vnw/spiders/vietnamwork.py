@@ -38,11 +38,16 @@ class VnwSpider(InitSpider):
     def parse(self, resp):
         url = resp.url
         keyword = url.split('.com/')[1].split('-kw')[0]
-        for div in resp.xpath('//div[@class="col-sm-9 col-sm-pull-3"]'):
+        for div in resp.xpath('//div[@class="col-sm-8 col-sm-pull-3"]'):
             post_date = div.xpath('div/div/div/span/'
                                   'span/span/text()').extract()[0]
             post_date = post_date.split(': ')[1]
-            convert_post_date = dateutil.parser.parse(post_date)
+
+	    if post_date.lower() == 'today':
+		convert_post_date = dateutil.parser.datetime.datetime.now().date()
+	    else:
+                convert_post_date = dateutil.parser.parse(post_date)
+
             for url in div.xpath('div/a/@href').extract():
                 request = scrapy.Request(url, self.parse_content,
                                          dont_filter=True)
