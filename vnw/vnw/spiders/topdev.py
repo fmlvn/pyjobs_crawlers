@@ -66,4 +66,6 @@ class TopdevSpider(scrapy.Spider):
             list_text.append(ulli)
 
         item["content"] = '|'.join(list_text).strip()
+        item["post_date"] = ''
+
         yield item
