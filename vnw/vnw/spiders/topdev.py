@@ -68,5 +68,8 @@ class TopdevSpider(scrapy.Spider):
 
         item["content"] = '|'.join(list_text).strip()
         item["post_date"] = ''
+        item["company"] = ''
+        item["specialize"] = ''
+        item["work"] = ''
 
         yield item
