@@ -24,6 +24,7 @@ class TopdevSpider(scrapy.Spider):
 
     def parse_content(self, resp):
         item = PyjobItem()
+        item["url"] = resp.url
         item["name"] = xtract(resp, '//div[@class="col-lg-12 col-md-12 col-sm-'
                                     '12 col-xs-12 title_name_job no-padding"]/'
                                     'h1/text()')

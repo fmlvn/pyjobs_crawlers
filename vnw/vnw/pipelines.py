@@ -2,7 +2,7 @@ import logging
 import requests
 
 logger = logging.getLogger(__name__)
-KWS = ['name', 'post_date', 'company', 'province', 'url']
+KWS = ['name', 'province', 'url']
 
 
 def xtract_item(item):
