@@ -38,6 +38,7 @@ class ItviecSpider(scrapy.Spider):
         month_convert = convert(month)
         item["expiry_date"] = '-'.join([str(datetime.date.today().year),
                                        month_convert, day])
+        item["post_date"] = ''
         item["province"] = resp.xpath('//div[@class="address"]'
                                       '/text()').extract()[0].split(',')[0]
         item["work"] = xtract(resp, '//div[@class="description"]/p/text()')
@@ -45,6 +46,8 @@ class ItviecSpider(scrapy.Spider):
                                           'p/text()')
         item["welfare"] = xtract(resp, '//div[@class="culture_description"]/'
                                        'p/text()')
+        # TODO login and get wage
+        item["wage"] = ''
         item["size"] = xtract(resp, '//p[@class="group-icon"]/text()')
 
         yield item
