@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 
 import scrapy
-from ..items import PyjobItem
-from ..pymods import xtract
-from ..keywords import KWS
+import dateutil.parser
+import time
+import logging
+
+from selenium import webdriver
 from scrapy.spiders.init import InitSpider
 from scrapy.http import Request, FormRequest
 from scrapy.conf import settings
-import dateutil.parser
+
+from ..items import PyjobItem
+from ..pymods import xtract
+from ..keywords import KWS
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger()
 
 
 class VnwSpider(InitSpider):
@@ -17,6 +25,9 @@ class VnwSpider(InitSpider):
     start_urls = [
         ("http://www.vietnamworks.com/" + kw + "-kw") for kw in KWS
     ]
+
+    def __init__(self):
+        self.driver = webdriver.PhantomJS()
 
     def init_request(self):
         return Request(url=self.login_page, callback=self.login)
@@ -38,23 +49,26 @@ class VnwSpider(InitSpider):
     def parse(self, resp):
         url = resp.url
         keyword = url.split('.com/')[1].split('-kw')[0]
-        for div in resp.xpath('//div[@class="col-sm-8 col-sm-pull-3"]'):
-            post_date = div.xpath('div/div/div/span/'
-                                  'span/span/text()').extract()[0]
-            post_date = post_date.split(': ')[1]
-
-	    if post_date.lower() == 'today':
-		convert_post_date = dateutil.parser.datetime.datetime.now().date()
-	    else:
+        self.driver.get(url)
+        time.sleep(2)
+        for div in self.driver.find_elements_by_xpath('//div[@class="job-item-info relative"]'):
+            try:
+                posted = div.find_element_by_class_name("posted")
+            except Exception, e:
+                _logger.info(str(e))
+                break
+            post_date = posted.text.split(': ')[1]
+            if post_date.lower() == 'today':
+                convert_post_date = dateutil.parser.datetime.datetime.now().date()
+            else:
                 convert_post_date = dateutil.parser.parse(post_date)
-
-            for url in div.xpath('div/a/@href').extract():
-                request = scrapy.Request(url, self.parse_content,
-                                         dont_filter=True)
-                request.meta["keyword"] = keyword
-                request.meta["post_date"] = str(convert_post_date
-                                                ).split(' ')[0]
-                yield request
+            url_tag = div.find_element_by_class_name("job-title")
+            url = url_tag.get_attribute("href")
+            request = scrapy.Request(url, self.parse_content, dont_filter=True)
+            request.meta["keyword"] = keyword
+            request.meta["post_date"] = str(convert_post_date).split(' ')[0]
+            yield request
+        self.driver.close()
 
     def parse_content(self, resp):
         item = PyjobItem()
@@ -74,8 +88,11 @@ class VnwSpider(InitSpider):
         item["specialize"] = xtract(resp, '//div[@class=""]/text()')
         item["information"] = xtract(resp,
                                      '//span[@id="companyprofile"]/text()')
-        item["contact"] = resp.xpath('//div[@class="company-info"]/p/strong/'
-                                     'text()').extract()[0].strip()
+        try:
+            item["contact"] = resp.xpath('//div[@class="company-info"]/p/strong/'
+                                         'text()').extract()[0].strip()
+        except IndexError:
+            item["contact"] = ''
         try:
             item["size"] = resp.xpath('//div[@class="company-info"]/p/strong/'
                                       'text()').extract()[1].strip()
