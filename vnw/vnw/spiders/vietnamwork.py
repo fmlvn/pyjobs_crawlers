@@ -50,7 +50,6 @@ class VnwSpider(InitSpider):
         url = resp.url
         keyword = url.split('.com/')[1].split('-kw')[0]
         self.driver.get(url)
-        time.sleep(2)
         for div in self.driver.find_elements_by_xpath('//div[@class="job-item-info relative"]'):
             try:
                 posted = div.find_element_by_class_name("posted")
