@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 import scrapy
 from ..keywords import KWS
 from ..items import PyjobItem
 from ..pymods import xtract
-from ..convert_month import convert
 
 
 class ItviecSpider(scrapy.Spider):
@@ -32,12 +29,7 @@ class ItviecSpider(scrapy.Spider):
         item["company"] = xtract(resp, '//h3[@class="name"]/text()')
         item["address"] = resp.xpath('//div[@class="address"]/'
                                      'text()').extract()[0].strip()
-        expiry_date = xtract(resp, '//div[@class="created_at"]/text()')
-        day = expiry_date.split(' ')[-1]
-        month = expiry_date.split(' ')[-2]
-        month_convert = convert(month)
-        item["expiry_date"] = '-'.join([str(datetime.date.today().year),
-                                       month_convert, day])
+        item["expiry_date"] = ''
         item["post_date"] = ''
         item["province"] = resp.xpath('//div[@class="address"]'
                                       '/text()').extract()[0].split(',')[0]
