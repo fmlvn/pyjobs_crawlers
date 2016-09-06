@@ -53,6 +53,8 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
+        if not item:
+            return
         try:
             kv = {kw: item[kw] for kw in KWS}
         except KeyError as e:
