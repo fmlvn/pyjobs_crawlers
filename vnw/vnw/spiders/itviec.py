@@ -31,7 +31,7 @@ class ItviecSpider(scrapy.Spider):
                                      'text()').extract()[0].strip()
         item["expiry_date"] = ''
         item["post_date"] = ''
-        item["province"] = resp.xpath('//div[@class="address"]'
+        item["province"] = resp.xpath('//div[@class="address__full-address"]'
                                       '/text()').extract()[0].split(',')[0]
         item["work"] = xtract(resp, '//div[@class="description"]/p/text()')
         item["specialize"] = xtract(resp, '//div[@class="experience"]/'
