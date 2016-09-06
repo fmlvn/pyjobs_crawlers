@@ -53,11 +53,18 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
-        if all(item[kw].strip() for kw in KWS):
-            item = xtract_item(item)
-            try:
-                requests.post(self.url, json=item._values)
-            except KeyError as e:
-                logger.error('Error: %s', e)
-        else:
-            logger.error('Bad job: %s', item['name'])
+        try:
+            kv = {kw: item[kw] for kw in KWS}
+        except KeyError as e:
+            logger.error('Bad job: %s, missing key %s', item['name'], e)
+            return
+        for k, v in kv.iteritems():
+            if v.strip() == '':
+                logger.error('Bad job: %s, key %s is empty', item['name'], k)
+                return
+
+        item = xtract_item(item)
+        try:
+            requests.post(self.url, json=item._values)
+        except KeyError as e:
+            logger.error('Error when posting: %s', e)
