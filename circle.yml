@@ -4,4 +4,4 @@ machine:
 
 test:
     post:
-      - flake8
+      - flake8 .
