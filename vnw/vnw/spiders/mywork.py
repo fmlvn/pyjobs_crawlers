@@ -17,9 +17,9 @@ date_post = u'Ngày cập nhật'
 
 
 class MyworkSpider(scrapy.Spider):
-    name = "mywork"
-    allowed_domains = ["mywork.com.vn"]
-    start_urls = [("http://mywork.com.vn/tim-viec-lam/" + kw + ".html")
+    name = 'mywork'
+    allowed_domains = ['mywork.com.vn']
+    start_urls = [('https://mywork.com.vn/tim-viec-lam/' + kw + '.html')
                   for kw in KWS]
 
     def parse(self, resp):
@@ -33,8 +33,9 @@ class MyworkSpider(scrapy.Spider):
         try:
             if resp.xpath('//div[@class="mywork-pages pagination"]/a/@class').\
                     extract()[-1] != u'disabled':
-                next_page = resp.xpath('//div[@class="mywork-pages pagination"'
-                                       ']/a/@href').extract()[-1]
+                next_page = resp.xpath('//div[contains(@class, '
+                                       '"mywork-pages pagination")]/'
+                                       '/a/@href').extract()[-1]
                 yield scrapy.Request(resp.urljoin(next_page), self.parse)
         except IndexError:
             print "Page none!"
@@ -53,30 +54,31 @@ class MyworkSpider(scrapy.Spider):
                                     '')
         item["company"] = xtract(resp,
                                  '//h1[@class="comp-name"]/a/text()')
-        item["address"] = xtract(
+        item["province"] = xtract(
             resp,
             '//div[@class="job-company-info"]/p/b/span/a/text()'
         )
         post_date = xtract(
-            resp, '//span[@class="job_update"]/text()'
+            resp, '//div[@class="job-current-info"]/div[2]/text()'
         ).split(': ')[1]
         item["post_date"] = parse_datetime(post_date)
         item["expiry_date"] = parse_datetime(expiry_date)
-        item["province"] = xtract(
+        item["address"] = xtract(
             resp,
             '//p[@class="address-company mw-ti-new"]/text()'
         )
 
-        item["wage"] = ' - '.join(
-            resp.xpath('//div[@class="job-company-info"]/p/b/span/text()'
-                       ).extract())
+        if not resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                          '/b/span/text()').extract():
+            item["wage"] = ' - '.join(
+                resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                           '/b/text()').extract())
+        else:
+            item["wage"] = ' - '.join(
+                resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                           '/b/span/text()').extract())
 
         desjob = resp.xpath('//div[@class="desjob-company"]')[1].extract()
-        item["specialize"] = desjob.splitlines()[2].strip().strip('-').strip().replace('<br>', '|').replace('-', '')
-
-        #if specialize == kws:
-        #    if xtract(desjob, 'p/text()') != u' ':
-        #        item["specialize"] = xtract(desjob, 'p/text()')
-        #    elif xtract(desjob, 'p/text()'):
-        #        item["specialize"] = xtract(desjob, 'div/text()')
+        item["specialize"] = desjob.splitlines()[2].strip(
+            ).strip('-').strip().replace('<br>', '|').replace('-', '')
         yield item

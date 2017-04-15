@@ -53,7 +53,7 @@ class VnwSpider(InitSpider):
         for div in self.driver.find_elements_by_xpath('//div[@class="job-item-info relative"]'):
             try:
                 posted = div.find_element_by_class_name("posted")
-            except Exception, e:
+            except Exception as e:
                 _logger.info(str(e))
                 break
             post_date = posted.text.split(': ')[1]
@@ -74,7 +74,7 @@ class VnwSpider(InitSpider):
         item["url"] = resp.url
         item["keyword"] = resp.meta["keyword"]
         item["post_date"] = resp.meta["post_date"]
-        item["name"] = xtract(resp, '//h1/text()')
+        item["name"] = xtract(resp, '//h1[@itemprop="title"]/text()')
         item["company"] = xtract(resp,
                                  '//span[@class="company-name text-lg block"]'
                                  '/strong/text()')

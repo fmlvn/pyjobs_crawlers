@@ -14,17 +14,17 @@ contact = u'Người liên hệ: '
 
 
 class CareerbuilderSpider(scrapy.Spider):
-    name = "careerbuilder"
+    name = 'careerbuilder'
     allowed_domains = ["careerbuilder.vn"]
     start_urls = [
-        ("http://careerbuilder.vn/viec-lam/" + KW +
-         "-k-trang-1-vi.html") for KW in KWS
+        ('http://careerbuilder.vn/viec-lam/' + KW +
+         '-k-vi.html') for KW in KWS
     ]
 
     def parse(self, resp):
         url = resp.url
         keyword = url.split("/viec-lam/")[1].split("-k-")[0]
-        for href in resp.xpath('//a[@class="job"]/@href').extract():
+        for href in resp.xpath('//h3[@class="job"]/a/@href').extract():
             request = scrapy.Request(href, self.parse_content)
             request.meta["keyword"] = keyword
             yield request
