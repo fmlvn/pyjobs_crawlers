@@ -41,9 +41,9 @@ class CareerbuilderSpider(scrapy.Spider):
         item["company"] = xtract(resp, '//div[@class="tit_company"]/text()')
         item["address"] = xtract(resp,
                                  '//label[@itemprop="addressLocality"]/text()')
-        if xtract(resp, '//b[@itemprop="jobLocation"]'):
+        if xtract(resp, '//p[@itemprop="jobLocation"]'):
             item["province"] = xtract(resp,
-                                      '//b[@itemprop="jobLocation"]/a/text()')
+                                      '//p[@itemprop="jobLocation"]/a/text()')
 
         if xtract(resp, '//div[@itemprop="description"]/ul/li/text()'):
             item["work"] = xtract(
