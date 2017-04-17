@@ -56,7 +56,16 @@ class APIPipeline(object):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
+        # Dropped item in prior step in pipeline
+        if item is None:
+            return
         try:
-            requests.post(self.url, json=item._values)
+            resp = requests.post(self.url, json=item._values)
+            if resp.status_code == 200:
+                logger.info('Added job %s, response %s',
+                            item._values.get('url'), resp.content)
+            else:
+                logger.error('Failed adding job %s, response %s',
+                             item._values.get('url'), resp.content)
         except KeyError as e:
             logger.error('Error when posting: %s', e)
