@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -x
+SPIDER=$1
+pushd vnw/vnw/spiders/
+if [ ! -z $SPIDER ]; then
+    scrapy crawl --loglevel=ERROR $SPIDER
+else
+    for spider in *.py; do
+        spider_name=$(basename $spider)
+        SPIDER=${spider_name/.py/}
+        scrapy crawl --loglevel=ERROR $SPIDER
+    done
+fi
+
+set +x
+popd
