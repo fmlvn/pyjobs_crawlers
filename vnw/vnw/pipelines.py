@@ -35,6 +35,9 @@ class ValidatePipeline(object):
                          e)
             return None
         for k, v in kv.iteritems():
+            assert isinstance(v, basestring), (
+                    "Pipeline only accepts string, "
+                    "crawler must preprocess other types to string")
             if v.strip() == '':
                 logger.error('Drop job: %s %s, required key %r is empty',
                              item.get('name', 'MISSING'),
