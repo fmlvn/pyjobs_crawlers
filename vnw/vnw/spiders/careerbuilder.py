@@ -44,6 +44,9 @@ class CareerbuilderSpider(scrapy.Spider):
         if xtract(resp, '//p[@itemprop="jobLocation"]'):
             item["province"] = xtract(resp,
                                       '//p[@itemprop="jobLocation"]/a/text()')
+        else:
+            item["province"] = xtract(resp,
+                                      '//b[@itemprop="jobLocation"]/a/text()')
 
         if xtract(resp, '//div[@itemprop="description"]/ul/li/text()'):
             item["work"] = xtract(
