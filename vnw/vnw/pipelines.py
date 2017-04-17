@@ -1,8 +1,9 @@
 import logging
 import requests
+from scrapy.exceptions import DropItem
 
 logger = logging.getLogger(__name__)
-KWS = ['name', 'province', 'url', 'work', 'specialize']
+REQUIRED_FIELDS = ['name', 'province', 'url', 'work', 'specialize']
 
 
 def xtract_item(item):
@@ -14,58 +15,43 @@ def xtract_item(item):
     return item
 
 
-class ElasticSearchPipeline(object):
-
-    collection_name = 'scrapy_items'
-
-    def __init__(self, address, index, type, port=9200):
-        self.url = 'http://{0}:{1}/{2}/{3}'.format(address, port, index, type)
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            address=crawler.settings.get('ES_ADDRESS'),
-            port=crawler.settings.get('ES_PORT', 9200),
-            index=crawler.settings.get('ES_INDEX'),
-            type=crawler.settings.get('ES_TYPE')
-        )
-
-    def process_item(self, item, spider):
-        try:
-            requests.post(self.url, json=item._values)
-        except Exception as e:
-            logger.error('Cannot POST job %s, error: %s',
-                         item['name'],
-                         e,
-                         exc_info=True)
-
-
 class VnwPipeline(object):
     def process_item(self, item, spider):
         return item
 
 
-class APIPipeline(object):
+class ValidatePipeline(object):
+    def process_item(self, item, spider):
+        if not item:
+            logger.error('Drop job, item is empty')
+            raise DropItem
+        try:
+            kv = {kw: item[kw] for kw in REQUIRED_FIELDS}
+        except KeyError as e:
+            logger.error('Drop job: %s %s, missing required key %r',
+                         item.get('name', 'MISSING'),
+                         item.get('url', 'MISSING'),
+                         e)
+            raise DropItem
+        for k, v in kv.iteritems():
+            if v.strip() == '':
+                logger.error('Drop job: %s %s, required key %r is empty',
+                             item.get('name', 'MISSING'),
+                             item.get('url', 'MISSING'),
+                             k)
+                raise DropItem
 
+        item = xtract_item(item)
+        return item
+
+
+class APIPipeline(object):
     collection_name = 'scrapy_items'
 
     def __init__(self):
         self.url = 'http://127.0.0.1:5000/python'
 
     def process_item(self, item, spider):
-        if not item:
-            return
-        try:
-            kv = {kw: item[kw] for kw in KWS}
-        except KeyError as e:
-            logger.error('Bad job: %s, missing key %s', item['name'], e)
-            return
-        for k, v in kv.iteritems():
-            if v.strip() == '':
-                logger.error('Bad job: %s, key %s is empty', item['name'], k)
-                return
-
-        item = xtract_item(item)
         try:
             requests.post(self.url, json=item._values)
         except KeyError as e:
