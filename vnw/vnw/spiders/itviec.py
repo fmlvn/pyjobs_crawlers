@@ -3,6 +3,7 @@
 import scrapy
 from ..keywords import KWS
 from ..items import PyjobItem
+from ..pymods import xtract
 
 
 class ItviecSpider(scrapy.Spider):
@@ -28,8 +29,7 @@ class ItviecSpider(scrapy.Spider):
                                      'h3[@class="name"]/'
                                      'text()').extract_first()
         item["address"] = resp.xpath('//div[@class="address__full-address"]/'
-                                     'span[@class="district_and_street"]/'
-                                     'text()').extract_first(
+                                     'span/text()').extract_first(
                                      ).replace('\n, ', '').replace('\n', '')
         item["expiry_date"] = ''
         item["post_date"] = ''
@@ -37,13 +37,13 @@ class ItviecSpider(scrapy.Spider):
                                       'span[@itemprop="addressLocality"]/'
                                       'text()').extract_first(
                                       ).replace('\n', '')
-        item["work"] = resp.xpath('//div[@class="job_description"]/'
-                                  'div[@class="description"]/'
-                                  'ul/li/text()').extract()
-        item["specialize"] = resp.xpath('//div[@class="experience"]/'
-                                        'ul/li/text()').extract()
-        item["welfare"] = resp.xpath('//div[@class="culture_description"]/'
-                                     'ul/li/text()').extract()
+        item["work"] = xtract(resp, ('//div[@class="job_description"]/'
+                                     'div[@class="description"]/'
+                                     'ul/li/text()'))
+        item["specialize"] = xtract(resp, ('//div[@class="experience"]/'
+                                           'ul/li/text()'))
+        item["welfare"] = xtract(resp, ('//div[@class="culture_description"]/'
+                                        'ul/li/text()'))
         item["wage"] = ''
         item["size"] = resp.xpath('//p[@class="group-icon"]/'
                                   'text()').extract_first().replace('\n', '')
