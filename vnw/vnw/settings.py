@@ -12,3 +12,9 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML,"
 
 # VIETNAMWORK_USERNAME = ''
 # VIETNAMWORK_PASSWORD = ''
+try:
+    import prodsettings as prod
+except ImportError:
+    pass
+else:
+    ITEM_PIPELINES.update(prod.ITEM_PIPELINES)
