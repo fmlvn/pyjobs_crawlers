@@ -2,10 +2,14 @@
 
 [![CircleCI](https://circleci.com/gh/tudoanh/pyjobs_crawlers.svg?style=svg)](https://circleci.com/gh/tudoanh/pyjobs_crawlers)
 
-Run all spiders by::
+Run all spiders by
 
-  ./runner
+```
+./runner
+```
 
-Or single one::
+Or run single spider
 
-  ./runner CareerBuilder
+```
+./runner CareerBuilder
+```
