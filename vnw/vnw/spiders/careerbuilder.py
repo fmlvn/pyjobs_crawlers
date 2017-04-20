@@ -37,7 +37,11 @@ class CareerbuilderSpider(scrapy.Spider):
         item = PyjobItem()
         item["keyword"] = resp.meta["keyword"]
         item["url"] = resp.url
-        item["name"] = xtract(resp, '//h1[@itemprop="title"]/text()')
+        if xtract(resp, '//h1[@itemprop="title"]/text()'):
+            item["name"] = xtract(resp, '//h1[@itemprop="title"]/text()')
+        else:
+            item["name"] = xtract(resp, '//div[@class="middle_title"/h1/'
+                                        'p[@itemprop="title"]')
         item["company"] = xtract(resp, '//div[@class="tit_company"]/text()')
         item["address"] = xtract(resp,
                                  '//label[@itemprop="addressLocality"]/text()')
@@ -57,7 +61,11 @@ class CareerbuilderSpider(scrapy.Spider):
             item["work"] = xtract(resp,
                                   '//div[@itemprop="description"]/p/text()')
 
-        if xtract(resp, '//div[@itemprop="experienceRequirements"]/ul/li'):
+        if xtract(resp,
+                  '//div[@itemprop="experienceRequirements"]'
+                  '/ul/li') and xtract(resp,
+                                       '//div[@itemprop'
+                                       '="experienceRequirements"]/p/strong'):
             item["specialize"] = xtract(
                     resp,
                     '//div[@itemprop="experienceRequirements"]'
@@ -67,6 +75,20 @@ class CareerbuilderSpider(scrapy.Spider):
                     '//div[@itemprop="experienceRequirements"]'
                     '/ul/li/text()'
             )
+        elif xtract(resp,
+                    '//div[@itemprop="experienceRequirements"]'
+                    '/div/ul/li'):
+            item["specialize"] = xtract(resp,
+                                        '//div[@itemprop'
+                                        '="experienceRequirements"]'
+                                        '/div/ul/li/text()')
+        elif xtract(resp,
+                    '//div[@itemprop="experienceRequirements"]'
+                    '/ul/li'):
+            item["specialize"] = xtract(resp,
+                                        '//div[@itemprop'
+                                        '="experienceRequirements"]'
+                                        '/ul/li/text()')
         else:
             item["specialize"] = \
                 xtract(resp, '//div[@itemprop="experienceRequirements"]/'
