@@ -66,19 +66,17 @@ class MyworkSpider(scrapy.Spider):
                 '//p[@class="address-company mw-ti-new"]/text()'
             )
 
-            if not resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                              '/b/span/text()').extract():
+            if not xtract(resp, '//div[@class="job-company-info"]/p[last()]'
+                                '/b/span/text()'):
                 item["wage"] = ' - '.join(
-                    resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                               '/b/text()').extract())
+                    xtract(resp, '//div[@class="job-company-info"]/p[last()]'
+                                 '/b/text()'))
             else:
                 item["wage"] = ' - '.join(
-                    resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                               '/b/span/text()').extract())
-
-            desjob = resp.xpath('//div[@class="desjob-company"]')[1].extract()
-            item["specialize"] = desjob.splitlines()[2].strip(
-                ).strip('-').strip().replace('<br>', '|').replace('-', '')
+                    xtract(resp, '//div[@class="job-company-info"]/p[last()]'
+                                 '/b/span/text()'))
+            item["specialize"] = xtract(resp, '//div[@class='
+                                              '"desjob-company"][2]/p/text()')
             item["work"] = xtract(resp, '//div[@class="desjob-company"][1]/'
                                         'text()')
             yield item
