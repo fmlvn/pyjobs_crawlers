@@ -3,6 +3,7 @@
 import scrapy
 from ..keywords import KWS
 from ..items import PyjobItem
+from ..pymods import xtract
 
 
 class TopdevSpider(scrapy.Spider):
@@ -22,31 +23,40 @@ class TopdevSpider(scrapy.Spider):
     def parse_content(self, resp):
         item = PyjobItem()
         item["url"] = resp.url
-        item["name"] = resp.xpath('//div[@class="job-header-info"]'
-                                  '/h1/text()').extract_first()
-        item["province"] = resp.xpath('//p[@class="work-location"]'
-                                      '/span/a/text()').extract_first()
-        item["wage"] = resp.xpath('//div[contains(@class, "salary")]'
-                                  '/span/text()').extract_first()
-        item["post_date"] = resp.xpath('//div[@id="image-employer"]'
-                                       '/*/*/div[2]/div[@class="'
-                                       'pull-right text-gray-light"]'
-                                       '/div[2]/text()').extract_first()
-        item["company"] = resp.xpath('//div[@class="job-header-info"]'
-                                     '/span[contains(@class, '
-                                     '"company-name")]/strong/'
-                                     'text()').extract_first()
-        if not resp.xpath('//div[@id="job-requirement"]'
-                          '/*/*/ul/li/text()').extract():
-            item["content"] = resp.xpath('//div[@id="job-requirement"]'
-                                         '/*/*/*/ul/li/text()').extract()
+        item["name"] = xtract(resp, '//div[@class="job-header-info"]'
+                                    '/h1/text()')
+        if xtract(resp, '//p[@class="work-location"]'
+                        '/span/a/text()'):
+            item["province"] = xtract(resp, '//p[@class="work-location"]'
+                                            '/span/a/text()')
         else:
-            item["content"] = resp.xpath('//div[@id="job-requirement"]'
-                                         '/*/*/ul/li/text()').extract()
+            item["province"] = 'Viet Nam'
+        item["wage"] = xtract(resp, '//div[contains(@class, "salary")]'
+                                    '/span/text()')
+        item["post_date"] = xtract(resp, '//div[@id="image-employer"]'
+                                         '/*/*/div[2]/div[@class="'
+                                         'pull-right text-gray-light"]'
+                                         '/div[2]/text()')
+        item["company"] = xtract(resp, '//div[@class="job-header-info"]'
+                                       '/span[contains(@class, '
+                                       '"company-name")]/strong/'
+                                       'text()')
+        if xtract(resp, '//div[@id="job-description"]/ul/li'):
+            item["work"] = xtract(resp, '//div[@id="job-description"]'
+                                        '/ul/li/text()')
+        elif xtract(resp, '//div[@id="job-description"]/div'):
+            item["work"] = xtract(resp, '//div[@id="job-description"]'
+                                        '/div/text()')
+        else:
+            item["work"] = xtract(resp, '//div[@id="job-description"]'
+                                        '/p/text()')
 
-        item["specialize"] = ''
-        item["work"] = ''
-        item["experience"] = ''
-        item["expiry_date"] = ''
+        if xtract(resp, '//div[@id="job-requirement"]'
+                        '/*/*/ul/li/text()'):
+            item["specialize"] = xtract(resp, '//div[@id="job-requirement"]'
+                                              '/*/*/ul/li/text()')
+        else:
+            item["specialize"] = xtract(resp, '//div[@id="job-requirement"]'
+                                              '/*/*/*/ul/li/text()')
 
         yield item

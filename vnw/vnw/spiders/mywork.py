@@ -46,39 +46,40 @@ class MyworkSpider(scrapy.Spider):
                              '//div[@class="job_deadline"]/text()'
                              ).split(': ')[1].strip(')')
 
-        if has_expired(expiry_date):
-            yield {}
-        item["keyword"] = resp.meta["keyword"]
-        item["url"] = resp.url
-        item["name"] = xtract(resp, '//div[@class="title-job-info"]/h1/text()'
-                                    '')
-        item["company"] = xtract(resp,
-                                 '//h1[@class="comp-name"]/a/text()')
-        item["province"] = xtract(
-            resp,
-            '//div[@class="job-company-info"]/p/b/span/a/text()'
-        )
-        post_date = xtract(
-            resp, '//div[@class="job-current-info"]/div[2]/text()'
-        ).split(': ')[1]
-        item["post_date"] = parse_datetime(post_date)
-        item["expiry_date"] = parse_datetime(expiry_date)
-        item["address"] = xtract(
-            resp,
-            '//p[@class="address-company mw-ti-new"]/text()'
-        )
+        if not has_expired(expiry_date):
+            item["keyword"] = resp.meta["keyword"]
+            item["url"] = resp.url
+            item["name"] = xtract(resp,
+                                  '//div[@class="title-job-info"]/h1/text()')
+            item["company"] = xtract(resp,
+                                     '//h1[@class="comp-name"]/a/text()')
+            item["province"] = xtract(
+                resp,
+                '//div[@class="job-company-info"]/p/b/span/a/text()'
+            )
+            post_date = xtract(
+                resp, '//div[@class="job-current-info"]/div[2]/text()'
+            ).split(': ')[1]
+            item["post_date"] = parse_datetime(post_date)
+            item["expiry_date"] = parse_datetime(expiry_date)
+            item["address"] = xtract(
+                resp,
+                '//p[@class="address-company mw-ti-new"]/text()'
+            )
 
-        if not resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                          '/b/span/text()').extract():
-            item["wage"] = ' - '.join(
-                resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                           '/b/text()').extract())
-        else:
-            item["wage"] = ' - '.join(
-                resp.xpath('//div[@class="job-company-info"]/p[last()]'
-                           '/b/span/text()').extract())
+            if not resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                              '/b/span/text()').extract():
+                item["wage"] = ' - '.join(
+                    resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                               '/b/text()').extract())
+            else:
+                item["wage"] = ' - '.join(
+                    resp.xpath('//div[@class="job-company-info"]/p[last()]'
+                               '/b/span/text()').extract())
 
-        desjob = resp.xpath('//div[@class="desjob-company"]')[1].extract()
-        item["specialize"] = desjob.splitlines()[2].strip(
-            ).strip('-').strip().replace('<br>', '|').replace('-', '')
-        yield item
+            desjob = resp.xpath('//div[@class="desjob-company"]')[1].extract()
+            item["specialize"] = desjob.splitlines()[2].strip(
+                ).strip('-').strip().replace('<br>', '|').replace('-', '')
+            item["work"] = xtract(resp, '//div[@class="desjob-company"][1]/'
+                                        'text()')
+            yield item
