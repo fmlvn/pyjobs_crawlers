@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import scrapy
 from ..keywords import KWS
 from ..items import PyjobItem

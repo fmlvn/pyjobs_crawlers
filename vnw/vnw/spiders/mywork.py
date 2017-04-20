@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import scrapy
 from ..items import PyjobItem
 from ..pymods import xtract, parse_datetime, has_expired
